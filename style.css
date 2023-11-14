@@ -1,11 +1,12 @@
-.shop{
-justify-content: center;
-align-items: center;
-display: grid;
-grid-template-columns: auto auto auto auto auto;
+.shop {
+    justify-content: center;
+    align-items: center;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto;
 }
-.product{
+
+.product {
     margin: 3vh;
-    background-color: lightblue;
+    background-color: rgb(173, 230, 229);
     padding: 1vh;
 }
