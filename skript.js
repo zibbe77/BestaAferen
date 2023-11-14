@@ -55,14 +55,14 @@ let products = [
 
 let chartItems = [];
 
-function UppdateCart(event, index, doAddRemove) {
+function UppdateCart(event, InstencP, doAddRemove) {
     let found = false;
     let doRemove = false;
     let removeAt;
 
     for (let object = 0; object < chartItems.length; object++) {
         //doAddRemove on to it 
-        if (chartItems[object].name === products[index].name) {
+        if (chartItems[object].name === InstencP.name) {
             if (doAddRemove === 1 || doAddRemove === -1) {
                 chartItems[object].count += doAddRemove;
                 if (chartItems[object].count === 0) {
@@ -80,17 +80,15 @@ function UppdateCart(event, index, doAddRemove) {
 
     //remove item 
     if (doRemove === true) {
-        console.log("before " + chartItems);
         let temp = chartItems[chartItems.length - 1];
         chartItems[chartItems.length - 1] = chartItems[removeAt];
         chartItems[removeAt] = temp;
         chartItems.pop();
-        console.log("after " + chartItems);
     }
 
     if (found === false) {
         //add to chart items
-        chartItems.push(products[index]);
+        chartItems.push(InstencP);
         chartItems[chartItems.length - 1].count = 1;
     }
 
@@ -120,9 +118,12 @@ function UppdateCart(event, index, doAddRemove) {
         divContener.append(itemCount);
 
         let buyButton = document.createElement("button");
-        buyButton.innerHTML = "remove"
+        buyButton.innerHTML = "Remove one"
+        buyButton.id = chartItems[i].name;
         buyButton.addEventListener("click", (event) => {
-            UppdateCart(event, index, -1);
+
+            UppdateCart(event, chartItems.find((e) => event.target.id === e.name), -1);
+
         })
         divContener.append(buyButton);
 
@@ -154,7 +155,7 @@ function UppdateView(arrayOfPruducts) {
         let buyButton = document.createElement("button");
         buyButton.innerHTML = "Add to cart"
         buyButton.addEventListener("click", (event) => {
-            UppdateCart(event, index, 1);
+            UppdateCart(event, arrayOfPruducts[index], 1);
         })
         divContener.append(buyButton);
 
@@ -168,7 +169,41 @@ function ChangeTag(event) {
         case "Alla":
             UppdateView(products);
             break;
-        case "Pris":
+        case "Pris_H":
+            products.sort((a, b) => b.price - a.price);
+            UppdateView(products);
+            break;
+        case "Pris_L":
+            products.sort((a, b) => a.price - b.price);
+            UppdateView(products);
+            break;
+
+        case "Alfabetisk_AF":
+            products.sort((a, b) => {
+                const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+                const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+                if (nameA < nameB) {
+                    return -1;
+                }
+                if (nameA > nameB) {
+                    return 1;
+                }
+            });
+            UppdateView(products);
+
+            break;
+        case "Alfabetisk_AL":
+            products.sort((a, b) => {
+                const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+                const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+                if (nameA < nameB) {
+                    return 1;
+                }
+                if (nameA > nameB) {
+                    return -1;
+                }
+            });
+            UppdateView(products);
 
             break;
         default:
@@ -179,8 +214,9 @@ function ChangeTag(event) {
 }
 
 function CreatBase() {
-    //creat div for pruducts
     let body = document.querySelector("body");
+
+    //creat div for pruducts
     let divMain = document.createElement("div");
     divMain.classList = "Main";
 
@@ -213,25 +249,52 @@ function CreatBase() {
     dropDown.append(choice);
 
     choice = document.createElement("option");
-    choice.innerHTML = "Tag  Lego";
+    choice.innerHTML = "Tag Lego";
     choice.id = "Lego";
+    dropDown.append(choice);
+
+    choice = document.createElement("option");
+    choice.innerHTML = "Sorter Alfabetisk A -> Ö";
+    choice.id = "Alfabetisk_AF";
+    dropDown.append(choice);
+
+    choice = document.createElement("option");
+    choice.innerHTML = "Sorter Alfabetisk Ö -> A";
+    choice.id = "Alfabetisk_AL";
+    dropDown.append(choice);
+
+    choice = document.createElement("option");
+    choice.innerHTML = "Sorter Pris högst till lägst";
+    choice.id = "Pris_H";
+    dropDown.append(choice);
+
+    choice = document.createElement("option");
+    choice.innerHTML = "Sorter Pris lägst till högst";
+    choice.id = "Pris_L";
     dropDown.append(choice);
 
     divMain.append(dropDown);
 
+
+    let shopCartDiv = document.createElement("div");
+    shopCartDiv.classList = "shopCartDiv";
+
     //shop
     let divShop = document.createElement("div");
     divShop.classList = "shop";
-    divMain.append(divShop);
-
-
-    //append shop
-    body.append(divMain);
+    shopCartDiv.append(divShop);
 
     //crete div for chart 
     let divCart = document.createElement("div");
     divCart.classList = "Cart";
-    body.append(divCart);
+    shopCartDiv.append(divCart);
+
+
+    divMain.append(shopCartDiv);
+
+    //append shop
+    body.append(divMain);
+
 
     //uppdate
     UppdateView(products);
