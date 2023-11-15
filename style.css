@@ -10,3 +10,12 @@
     background-color: rgb(173, 230, 229);
     padding: 1vh;
 }
+
+header {
+    justify-content: space-between;
+    align-items: center;
+    display: grid;
+    grid-template-columns: 60% auto auto;
+    padding-left: 5vh;
+    padding-right: 5vh;
+}

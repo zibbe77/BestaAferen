@@ -51,6 +51,22 @@ let products = [
         price: 9800,
         tag: "Lego",
     },
+    {
+        name: "Stellaris",
+        price: 458,
+        tag: "Spel",
+    },
+    {
+        name: "Kofta med krage Regular Fit",
+        price: 499,
+        tag: "Kläder",
+    },
+    {
+        name: "NORDMÄRKE",
+        price: 129,
+        tag: "Elektronik",
+    },
+
 ];
 let tagList = [];
 
@@ -175,9 +191,6 @@ function ChangeSort() {
     });
 
     switch (itemList.selectedOptions[0].id) {
-        case "Alla":
-
-            break;
         case "Pris_H":
             diplaySet.sort((a, b) => b.price - a.price);
             break;
@@ -210,8 +223,6 @@ function ChangeSort() {
             });
             break;
         default:
-            // let diplaySet = products.filter(item => item.tag === itemList.selectedOptions[0].id);
-            // UppdateView(diplaySet);
             break;
     }
     //uppdates
@@ -225,19 +236,40 @@ function ChangeTag(event) {
     for (let i = 0; i < itemList.selectedOptions.length; i++) {
         tagList[i] = itemList.selectedOptions[i].id;
     }
-    console.log(tagList);
+    ChangeSort();
 }
 
 function CreatBase() {
 
     let body = document.querySelector("body");
 
+    // header
+    //-------------------------------------------------------------
     let header = document.createElement("header");
+
+    //titel
+    let h1 = document.createElement("h1");
+    h1.innerHTML = "Shop";
+    header.append(h1);
+
+    let h2 = document.createElement("h2");
+    h2.innerHTML = "test";
+    header.append(h2);
+
+    let chartImg = document.createElement("h2");
+    chartImg.innerHTML = "chartIMG";
+    header.append(chartImg);
+
+
+    body.append(header);
+    //-------------------------------------------------------------
+
+    let sortOpstionDiv = document.createElement("div");
 
     //label
     let dropDownLabel = document.createElement("label");
     dropDownLabel.innerHTML = "Sortera efter ";
-    header.append(dropDownLabel);
+    sortOpstionDiv.append(dropDownLabel);
 
     //drop down Sort
     //-------------------------------------------------------------
@@ -268,8 +300,7 @@ function CreatBase() {
     choice.id = "Pris_L";
     dropDown.append(choice);
 
-    header.append(dropDown);
-
+    sortOpstionDiv.append(dropDown);
 
     let shopCartDiv = document.createElement("div");
     shopCartDiv.classList = "shopCartDiv";
@@ -278,7 +309,7 @@ function CreatBase() {
     //-------------------------------------------------------------
     let dropDownLabelTag = document.createElement("label");
     dropDownLabelTag.innerHTML = "Vilka Tags";
-    header.append(dropDownLabelTag);
+    sortOpstionDiv.append(dropDownLabelTag);
 
     let dropDownTag = document.createElement("select");
     dropDownTag.id = "Tag";
@@ -296,8 +327,6 @@ function CreatBase() {
         }
     });
 
-    console.log(tagListTemp);
-
     tagListTemp.forEach(element => {
         choiceTag = document.createElement("option");
         choiceTag.innerHTML = "Tag: " + element;
@@ -305,21 +334,15 @@ function CreatBase() {
         dropDownTag.append(choiceTag);
     });
 
-    header.append(dropDownTag);
-    //append header
+    sortOpstionDiv.append(dropDownTag);
+    //append SortOpstionDiv
     //-------------------------------------------------------------
-    body.append(header);
+    body.append(sortOpstionDiv);
     //-------------------------------------------------------------
 
     //creat div for pruducts
     let divMain = document.createElement("div");
     divMain.classList = "Main";
-
-    //titel
-    let h1 = document.createElement("h1");
-    h1.innerHTML = "Shop";
-    divMain.append(h1);
-
 
     //shop
     let divShop = document.createElement("div");
@@ -331,12 +354,10 @@ function CreatBase() {
     divCart.classList = "Cart";
     shopCartDiv.append(divCart);
 
-
     divMain.append(shopCartDiv);
 
     //append shop
     body.append(divMain);
-
 
     //uppdate
     products.sort((a, b) => {
