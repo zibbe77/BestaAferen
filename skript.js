@@ -52,6 +52,7 @@ let products = [
         tag: "Lego",
     },
 ];
+let tagList = [];
 
 let chartItems = [];
 
@@ -163,23 +164,29 @@ function UppdateView(arrayOfPruducts) {
     }
 }
 
-function ChangeTag(event) {
+function ChangeSort() {
     let itemList = document.getElementById("SortAfter");
+
+    let diplaySet = [];
+    //temp
+    tagList.forEach(element => {
+        let tempSaveList = products.filter(item => item.tag === element);
+        Array.prototype.push.apply(diplaySet, tempSaveList);
+    });
+
     switch (itemList.selectedOptions[0].id) {
         case "Alla":
-            UppdateView(products);
+
             break;
         case "Pris_H":
-            products.sort((a, b) => b.price - a.price);
-            UppdateView(products);
+            diplaySet.sort((a, b) => b.price - a.price);
             break;
         case "Pris_L":
-            products.sort((a, b) => a.price - b.price);
-            UppdateView(products);
+            diplaySet.sort((a, b) => a.price - b.price);
             break;
 
         case "Alfabetisk_AF":
-            products.sort((a, b) => {
+            diplaySet.sort((a, b) => {
                 const nameA = a.name.toUpperCase(); // ignore upper and lowercase
                 const nameB = b.name.toUpperCase(); // ignore upper and lowercase
                 if (nameA < nameB) {
@@ -189,11 +196,9 @@ function ChangeTag(event) {
                     return 1;
                 }
             });
-            UppdateView(products);
-
             break;
         case "Alfabetisk_AL":
-            products.sort((a, b) => {
+            diplaySet.sort((a, b) => {
                 const nameA = a.name.toUpperCase(); // ignore upper and lowercase
                 const nameB = b.name.toUpperCase(); // ignore upper and lowercase
                 if (nameA < nameB) {
@@ -203,55 +208,45 @@ function ChangeTag(event) {
                     return -1;
                 }
             });
-            UppdateView(products);
-
             break;
         default:
-            let diplaySet = products.filter(item => item.tag === itemList.selectedOptions[0].id);
-            UppdateView(diplaySet);
+            // let diplaySet = products.filter(item => item.tag === itemList.selectedOptions[0].id);
+            // UppdateView(diplaySet);
             break;
     }
+    //uppdates
+    UppdateView(diplaySet);
+}
+
+function ChangeTag(event) {
+    let itemList = document.getElementById("Tag");
+    tagList = [];
+
+    for (let i = 0; i < itemList.selectedOptions.length; i++) {
+        tagList[i] = itemList.selectedOptions[i].id;
+    }
+    console.log(tagList);
 }
 
 function CreatBase() {
+
     let body = document.querySelector("body");
 
-    //creat div for pruducts
-    let divMain = document.createElement("div");
-    divMain.classList = "Main";
-
-    //titel
-    let h1 = document.createElement("h1");
-    h1.innerHTML = "Shop";
-    divMain.append(h1);
+    let header = document.createElement("header");
 
     //label
     let dropDownLabel = document.createElement("label");
     dropDownLabel.innerHTML = "Sortera efter ";
-    divMain.append(dropDownLabel);
+    header.append(dropDownLabel);
 
-    //drop down
+    //drop down Sort
+    //-------------------------------------------------------------
     let dropDown = document.createElement("select");
     dropDown.id = "SortAfter";
 
     dropDown.addEventListener("change", (event) => {
-        ChangeTag(event);
+        ChangeSort(event);
     })
-
-    let choice = document.createElement("option");
-    choice.innerHTML = " Tag Alla";
-    choice.id = "Alla";
-    dropDown.append(choice);
-
-    choice = document.createElement("option");
-    choice.innerHTML = "Tag Bygg";
-    choice.setAttribute("id", "Bygg");
-    dropDown.append(choice);
-
-    choice = document.createElement("option");
-    choice.innerHTML = "Tag Lego";
-    choice.id = "Lego";
-    dropDown.append(choice);
 
     choice = document.createElement("option");
     choice.innerHTML = "Sorter Alfabetisk A -> Ö";
@@ -273,11 +268,58 @@ function CreatBase() {
     choice.id = "Pris_L";
     dropDown.append(choice);
 
-    divMain.append(dropDown);
+    header.append(dropDown);
 
 
     let shopCartDiv = document.createElement("div");
     shopCartDiv.classList = "shopCartDiv";
+
+    //drop down tag
+    //-------------------------------------------------------------
+    let dropDownLabelTag = document.createElement("label");
+    dropDownLabelTag.innerHTML = "Vilka Tags";
+    header.append(dropDownLabelTag);
+
+    let dropDownTag = document.createElement("select");
+    dropDownTag.id = "Tag";
+    dropDownTag.multiple = true;
+
+    dropDownTag.addEventListener("change", (event) => {
+        ChangeTag();
+    })
+
+    //adds all tags in pruducts
+    let tagListTemp = [];
+    products.forEach(element => {
+        if (!tagListTemp.includes(element.tag)) {
+            tagListTemp.push(element.tag);
+        }
+    });
+
+    console.log(tagListTemp);
+
+    tagListTemp.forEach(element => {
+        choiceTag = document.createElement("option");
+        choiceTag.innerHTML = "Tag: " + element;
+        choiceTag.id = element
+        dropDownTag.append(choiceTag);
+    });
+
+    header.append(dropDownTag);
+    //append header
+    //-------------------------------------------------------------
+    body.append(header);
+    //-------------------------------------------------------------
+
+    //creat div for pruducts
+    let divMain = document.createElement("div");
+    divMain.classList = "Main";
+
+    //titel
+    let h1 = document.createElement("h1");
+    h1.innerHTML = "Shop";
+    divMain.append(h1);
+
 
     //shop
     let divShop = document.createElement("div");
@@ -297,6 +339,16 @@ function CreatBase() {
 
 
     //uppdate
+    products.sort((a, b) => {
+        const nameA = a.name.toUpperCase(); // ignore upper and lowercase
+        const nameB = b.name.toUpperCase(); // ignore upper and lowercase
+        if (nameA < nameB) {
+            return -1;
+        }
+        if (nameA > nameB) {
+            return 1;
+        }
+    });
     UppdateView(products);
 }
 
