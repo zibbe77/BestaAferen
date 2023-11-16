@@ -19,3 +19,8 @@ header {
     padding-left: 5vh;
     padding-right: 5vh;
 }
+
+img {
+    width: 60%;
+    height: auto;
+}

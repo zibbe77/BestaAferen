@@ -5,66 +5,79 @@ let products = [
         name: "Träskruv FZB 6,0x100",
         price: 169,
         tag: "Bygg",
+        img: "24964-1_230197a26a-17e1-4012-8645-855c2ba85bd2_2.webp",
     },
     {
         name: "Hammare Stanley",
         price: 99.95,
         tag: "Bygg",
+        img: "280019_23bef95291-b0a4-4a02-a5aa-9ea31aecc061.webp",
     },
     {
         name: "Borrhammare MAKITA DHR202Z 18V utan batteri och laddare",
         price: 1839,
         tag: "Bygg",
+        img: "as.46811959.jpg",
     },
     {
         name: "Stålhammare DEWALT rivklo slät 16oz",
         price: 499,
         tag: "Bygg",
+        img: "DV_8_10561184_01_4c_SE_20220421094652.jpg",
     },
     {
         name: "Foder vit 12x43x2200mm S 0502-Y",
         price: 72.95,
         tag: "Bygg",
+        img: "DV_8_5107437_01_4c_SE_20230731111133.jpg",
     },
     {
         name: "Himeji slott",
         price: 1900,
         tag: "Lego",
+        img: "21060.webp",
     },
     {
         name: "Lejonriddarnas slott",
         price: 4650,
         tag: "Lego",
+        img: "10305.webp",
     },
     {
         name: "Venator-Class Republic Attack Cruiser",
         price: 7800,
         tag: "Lego",
+        img: "75367.webp",
     },
     {
         name: "Millennium Falcon",
         price: 9800,
         tag: "Lego",
+        img: "75192.webp",
     },
     {
         name: "AT-AT",
         price: 9800,
         tag: "Lego",
+        img: "75313_Prod.webp"
     },
     {
         name: "Stellaris",
         price: 458,
         tag: "Spel",
+        img: "Stellaris.jpeg",
     },
     {
         name: "Kofta med krage Regular Fit",
         price: 499,
         tag: "Kläder",
+        img: "hmgoepprod.webp",
     },
     {
         name: "NORDMÄRKE",
         price: 129,
         tag: "Elektronik",
+        img: "nordmaerke-tradloes-laddare-textil-gra__0841954_pe778828_s5.avif",
     },
 
 ];
@@ -72,7 +85,38 @@ let tagList = [];
 
 let chartItems = [];
 
-function UppdateCart(event, InstencP, doAddRemove) {
+function UppdateTotalCartItems(doAddRemove) {
+    let num = localStorage.getItem("TotalItems");
+    num = parseInt(num);
+    localStorage.setItem("TotalItems", num + doAddRemove);
+
+    let cartTotalNum = document.querySelector(".cartItemCountP");
+    cartTotalNum.innerHTML = num + doAddRemove;
+}
+
+function UppdateCartStart() {
+
+    //make totalItem allways exist
+    let existTotalItems = localStorage.getItem("TotalItems");
+    if (existTotalItems == null) { localStorage.setItem("TotalItems", 0); }
+
+    //set TotalItems on reload 
+    let cartTotalNum = document.querySelector(".cartItemCountP");
+    cartTotalNum.innerHTML = existTotalItems;
+
+    //find all obs in cart
+    products.forEach(element => {
+        let get = localStorage.getItem(element.name);
+        if (get != null) {
+            // console.log("test");
+            chartItems.push(element);
+            chartItems[chartItems.length - 1].count = parseInt(get);
+        }
+    });
+    UppdateCart();
+}
+
+function AddOrRemoveCart(InstencP, doAddRemove) {
     let found = false;
     let doRemove = false;
     let removeAt;
@@ -82,6 +126,8 @@ function UppdateCart(event, InstencP, doAddRemove) {
         if (chartItems[object].name === InstencP.name) {
             if (doAddRemove === 1 || doAddRemove === -1) {
                 chartItems[object].count += doAddRemove;
+                localStorage.setItem(chartItems[object].name, chartItems[object].count);
+                UppdateTotalCartItems(doAddRemove);
                 if (chartItems[object].count === 0) {
                     doRemove = true;
                     removeAt = object;
@@ -97,19 +143,27 @@ function UppdateCart(event, InstencP, doAddRemove) {
 
     //remove item 
     if (doRemove === true) {
+        //in local storges 
+        localStorage.removeItem(chartItems[removeAt].name);
+        //in javaskript cart
         let temp = chartItems[chartItems.length - 1];
         chartItems[chartItems.length - 1] = chartItems[removeAt];
         chartItems[removeAt] = temp;
         chartItems.pop();
     }
 
+    //add to chart items first time
     if (found === false) {
-        //add to chart items
         chartItems.push(InstencP);
         chartItems[chartItems.length - 1].count = 1;
+        localStorage.setItem(InstencP.name, InstencP.count);
+        UppdateTotalCartItems(doAddRemove);
     }
 
-    //uppdate chart
+    UppdateCart();
+}
+function UppdateCart() {
+    //uppdate chart Html
     let shop = document.querySelector(".Cart");
     shop.innerHTML = "";
 
@@ -139,7 +193,7 @@ function UppdateCart(event, InstencP, doAddRemove) {
         buyButton.id = chartItems[i].name;
         buyButton.addEventListener("click", (event) => {
 
-            UppdateCart(event, chartItems.find((e) => event.target.id === e.name), -1);
+            AddOrRemoveCart(chartItems.find((e) => event.target.id === e.name), -1);
 
         })
         divContener.append(buyButton);
@@ -165,6 +219,10 @@ function UppdateView(arrayOfPruducts) {
         price.innerHTML = arrayOfPruducts[index].price + "kr";
         divContener.append(price);
 
+        let img = document.createElement("img");
+        img.src = "/IMGs/" + arrayOfPruducts[index].img;
+        divContener.append(img);
+
         let tag = document.createElement("p");
         tag.innerHTML = "Tag: " + arrayOfPruducts[index].tag;
         divContener.append(tag);
@@ -172,7 +230,7 @@ function UppdateView(arrayOfPruducts) {
         let buyButton = document.createElement("button");
         buyButton.innerHTML = "Add to cart"
         buyButton.addEventListener("click", (event) => {
-            UppdateCart(event, arrayOfPruducts[index], 1);
+            AddOrRemoveCart(arrayOfPruducts[index], 1);
         })
         divContener.append(buyButton);
 
@@ -256,10 +314,19 @@ function CreatBase() {
     h2.innerHTML = "test";
     header.append(h2);
 
-    let chartImg = document.createElement("h2");
-    chartImg.innerHTML = "chartIMG";
-    header.append(chartImg);
+    let cartDivHeader = document.createElement("div");
+    cartDivHeader.classList = "chartDivHeader";
 
+    let cartImg = document.createElement("h2");
+    cartImg.innerHTML = "chartIMG";
+    cartDivHeader.append(cartImg);
+
+    let cartItemCountP = document.createElement("p");
+    cartItemCountP.innerHTML = 0;
+    cartItemCountP.classList = "cartItemCountP";
+    cartDivHeader.append(cartItemCountP);
+
+    header.append(cartDivHeader);
 
     body.append(header);
     //-------------------------------------------------------------
@@ -375,3 +442,4 @@ function CreatBase() {
 
 //run
 CreatBase();
+UppdateCartStart();
