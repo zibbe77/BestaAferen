@@ -2,20 +2,23 @@
     justify-content: center;
     align-items: center;
     display: grid;
-    grid-template-columns: auto auto auto auto auto;
+    grid-template-columns: repeat(5, 1fr);
 }
 
 .product {
     margin: 3vh;
     background-color: rgb(173, 230, 229);
     padding: 1vh;
+    width: 90%;
+    height: 90%;
+    border-radius: 10%;
 }
 
 header {
     justify-content: space-between;
     align-items: center;
     display: grid;
-    grid-template-columns: 60% auto auto;
+    grid-template-columns: 60% auto 10%;
     padding-left: 5vh;
     padding-right: 5vh;
 }
@@ -23,4 +26,21 @@ header {
 img {
     width: 60%;
     height: auto;
+}
+
+.cartImg {
+    width: 50%;
+    height: auto;
+
+}
+
+.cartImg:hover {
+    background-color: aqua;
+}
+
+.chartDivHeader {
+    display: grid;
+    grid-template-columns: auto auto;
+    justify-content: center;
+    align-items: center;
 }

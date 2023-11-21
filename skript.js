@@ -82,8 +82,8 @@ let products = [
 
 ];
 let tagList = [];
-
 let chartItems = [];
+let state_P = 0;
 
 function UppdateTotalCartItems(doAddRemove) {
     let num = localStorage.getItem("TotalItems");
@@ -161,48 +161,53 @@ function AddOrRemoveCart(InstencP, doAddRemove) {
     }
 
     UppdateCart();
+
 }
+
 function UppdateCart() {
     //uppdate chart Html
     let shop = document.querySelector(".Cart");
     shop.innerHTML = "";
 
-    for (let i = 0; i < chartItems.length; i++) {
-        let divContener = document.createElement("div");
-        divContener.classList.add("CartItem");
-        divContener.classList.add(chartItems[i].tag);
+    if (state_P === 1) {
+        for (let i = 0; i < chartItems.length; i++) {
+            let divContener = document.createElement("div");
+            divContener.classList.add("CartItem");
+            divContener.classList.add(chartItems[i].tag);
 
-        let name = document.createElement("h3");
-        name.innerHTML = chartItems[i].name;
-        divContener.append(name);
+            let name = document.createElement("h3");
+            name.innerHTML = chartItems[i].name;
+            divContener.append(name);
 
-        let price = document.createElement("h3");
-        price.innerHTML = chartItems[i].price + "kr";
-        divContener.append(price);
+            let price = document.createElement("h3");
+            price.innerHTML = chartItems[i].price + "kr";
+            divContener.append(price);
 
-        let tag = document.createElement("p");
-        tag.innerHTML = "Tag: " + chartItems[i].tag;
-        divContener.append(tag);
+            let tag = document.createElement("p");
+            tag.innerHTML = "Tag: " + chartItems[i].tag;
+            divContener.append(tag);
 
-        let itemCount = document.createElement("p");
-        itemCount.innerHTML = "Count: " + chartItems[i].count;
-        divContener.append(itemCount);
+            let itemCount = document.createElement("p");
+            itemCount.innerHTML = "Count: " + chartItems[i].count;
+            divContener.append(itemCount);
 
-        let buyButton = document.createElement("button");
-        buyButton.innerHTML = "Remove one"
-        buyButton.id = chartItems[i].name;
-        buyButton.addEventListener("click", (event) => {
+            let buyButton = document.createElement("button");
+            buyButton.innerHTML = "Remove one"
+            buyButton.id = chartItems[i].name;
+            buyButton.addEventListener("click", (event) => {
 
-            AddOrRemoveCart(chartItems.find((e) => event.target.id === e.name), -1);
+                AddOrRemoveCart(chartItems.find((e) => event.target.id === e.name), -1);
 
-        })
-        divContener.append(buyButton);
+            })
+            divContener.append(buyButton);
 
-        shop.append(divContener);
+            shop.append(divContener);
+        }
     }
 }
 
 function UppdateView(arrayOfPruducts) {
+
     let shop = document.querySelector(".shop");
     shop.innerHTML = "";
 
@@ -247,6 +252,10 @@ function ChangeSort() {
         let tempSaveList = products.filter(item => item.tag === element);
         Array.prototype.push.apply(diplaySet, tempSaveList);
     });
+
+    if (tagList.length === 0) {
+        diplaySet = products;
+    }
 
     switch (itemList.selectedOptions[0].id) {
         case "Pris_H":
@@ -297,8 +306,37 @@ function ChangeTag(event) {
     ChangeSort();
 }
 
-function CreatBase() {
+function StateMachineStart() {
+    let stateOfPage = localStorage.getItem("StateOfPage");
+    if (stateOfPage === null) {
+        localStorage.setItem("StateOfPage", state_P);
+    } else {
+        state_P = parseInt(stateOfPage);
+    }
+    StateMachineSet();
+}
+function StateMachineChangeState(change) {
+    state_P = parseInt(change);
+    localStorage.setItem("StateOfPage", state_P);
+    StateMachineSet();
+}
 
+function StateMachineSet() {
+    let body = document.querySelector("body");
+    body.innerHTML = "";
+    body.append();
+
+    switch (state_P) {
+        case 0:
+            ShopView();
+            break
+        case 1:
+            ShopingChart();
+            break;
+    }
+}
+
+function HeaderCreat() {
     let body = document.querySelector("body");
 
     // header
@@ -317,9 +355,22 @@ function CreatBase() {
     let cartDivHeader = document.createElement("div");
     cartDivHeader.classList = "chartDivHeader";
 
-    let cartImg = document.createElement("h2");
-    cartImg.innerHTML = "chartIMG";
+    let cartImg = document.createElement("img");
+    cartImg.src = "/IMGs/263142.png";
+    cartImg.classList = "cartImg";
+    cartImg.addEventListener("click", (event) => {
+        console.log("chat click");
+
+        let passValueState;
+        if (state_P === 0) {
+            passValueState = 1
+        } else {
+            passValueState = 0;
+        }
+        StateMachineChangeState(passValueState);
+    })
     cartDivHeader.append(cartImg);
+
 
     let cartItemCountP = document.createElement("p");
     cartItemCountP.innerHTML = 0;
@@ -329,13 +380,51 @@ function CreatBase() {
     header.append(cartDivHeader);
 
     body.append(header);
+}
+
+function ShopingChart() {
+    HeaderCreat();
+    let body = document.querySelector("body");
+
+    //-------------------------------------------------------------
+
+    //creat div for pruducts
+    let divMain = document.createElement("div");
+    divMain.classList = "Main";
+
+    let shopCartDiv = document.createElement("div");
+    shopCartDiv.classList = "shopCartDiv";
+
+    //shop
+    let divShop = document.createElement("div");
+    divShop.classList = "shop";
+    shopCartDiv.append(divShop);
+
+    //crete div for chart 
+    let divCart = document.createElement("div");
+    divCart.classList = "Cart";
+    shopCartDiv.append(divCart);
+
+    divMain.append(shopCartDiv);
+
+    //append shop
+    body.append(divMain);
+    UppdateCart();
+}
+
+function ShopView() {
+    HeaderCreat();
+
+    let body = document.querySelector("body");
     //-------------------------------------------------------------
 
     let sortOpstionDiv = document.createElement("div");
+    sortOpstionDiv.classList = "sortOpstionDiv";
 
     //label
     let dropDownLabel = document.createElement("label");
     dropDownLabel.innerHTML = "Sortera efter ";
+    dropDownLabel.classList = "dropDownLabel";
     sortOpstionDiv.append(dropDownLabel);
 
     //drop down Sort
@@ -441,5 +530,5 @@ function CreatBase() {
 }
 
 //run
-CreatBase();
+StateMachineStart();
 UppdateCartStart();
